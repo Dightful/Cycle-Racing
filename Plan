@@ -1,0 +1,26 @@
+Riders management:
+- Manages riders and teams
+- Interface, riders and teams would use inheritance
+
+Race design:
+- Allows creation of stages
+- Interface for races, classes/methods for each terrain type
+Terrain types:
+1. Flat
+2. Hilly finish
+3. High mountain
+4. Time trial
+
+Race results:
+- Allows the recording of rider results
+
+
+
+
+Cycling portal:
+- Implementation
+
+
+Interface:
+- Develop a class that implements the interface given 
+
