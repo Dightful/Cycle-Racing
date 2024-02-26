@@ -4,6 +4,7 @@ Riders management:
 
 Race design:
 - Allows creation of stages
+-Within each stage there are checkpoints: intermediate sprints/categorized climbs
 - Interface for races, classes/methods for each terrain type
 Terrain types:
 1. Flat
@@ -14,13 +15,24 @@ Terrain types:
 Race results:
 - Allows the recording of rider results
 
+Competitions:
+- General Classifications: Fastest time
 
+- Points Classification: Best average rank
+
+- Mountain Classification: - Reach mountain peaks first 
 
 
 Cycling portal:
+- CyclingPortal.java 
 - Implementation
+- Write the additional package members to complete the cycling package
+
+
+
 
 
 Interface:
-- Develop a class that implements the interface given 
+- Develop a class that implements the interface given
+- This must be coded and named  CyclingPortalImpl.
 
