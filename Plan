@@ -1,9 +1,42 @@
+Requirements and Goals:
+- We want to create a cycling staged race with different stages and three different point categories
+
+- Key features will be described below
+
+Main entities:
+- Riders
+- Teams
+- Races
+- Stages
+- Checkpoints
+- Competitions
+
+Classes for each entity:
+- Rider
+- Team
+- Race
+- Stage (Enums)
+- Checkpoint
+- Competitions (using subclasses for each category)
+
+Relationships between entities:
+- Riders belong to teams
+- Races consist of multiple stages
+- Stages contain checkpoints
+- Competitions are a part of races
+
+
+
+
+
 Riders management:
 - Manages riders and teams
+- Add, remove and update riders information
 - Interface, riders and teams would use inheritance
 
 Race design:
 - Allows creation of stages
+- Create races, add stages to races, configure stages with checkpoints
 -Within each stage there are checkpoints: intermediate sprints/categorized climbs
 - Interface for races, classes/methods for each terrain type
 Terrain types:
@@ -14,6 +47,7 @@ Terrain types:
 
 Race results:
 - Allows the recording of rider results
+- Calculate overall results for each category
 
 Competitions:
 - General Classifications: Fastest time
@@ -29,8 +63,21 @@ Cycling portal:
 
 Interface:
 - Develop a class that implements the interface given
-- This must be coded and named  CyclingPortalImpl.
+- This must be coded and named CyclingPortalImpl.
+
+Given programming stuff information:
+• TestSystem – (optional) containing your test files.
+• src – to keep the source code (*.java files), including those provided as part of the coursework.
+• bin – to keep the bytecode (*.class files).
+• doc – to save the Javadoc from your code.
+• res – to add any other resource you need in addition to the class diagram and cover page.
+
+- The code with Bad___ is able to be compiled but has the wrong functionality
+
+
 
 Overview:
+- Make sure class diagram is done 
+- Looks like we are starting with MiniCyclingPortal.java first and filling in those blanks
 - Right now it looks as though we need to fill in the blanks to the files
-- 
+- A lot of exception throws to deal with for each object 
