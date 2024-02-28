@@ -25,10 +25,6 @@ Relationships between entities:
 - Stages contain checkpoints
 - Competitions are a part of races
 
-
-
-
-
 Riders management:
 - Manages riders and teams
 - Add, remove and update riders information
