@@ -1,0 +1,44 @@
+MiniCyclingPortal
++ getRaceIds(): int array
++ createRace(String, String): int
++ viewRaceDetails(int): String
++ removeRaceById(int): void
++ getNumberOfStages(int): int
++ addStageToRace(int, String, String, double, LocalDateTime, StageType): int
++ getRaceStages(int): int array
++ getStageLength(int): double
++ removeStageById(int): void
++ addCategorizedClimbToStage(int, Double, CheckpointType, Double, Double): int
++ addIntermediateSprintToStage(int, double): int
++ removeCheckpoint(int): void
++ concludeStagePreparation(int): void
++ getStageCheckpoints(int): int array
++ createTeam(String, String): int
++ removeTeam(int): void
++ getTeams(): int array
++ getTeamRiders(int): int array
++ createRider(int, String, int): int
++ removeRider(int): void
++ registerRiderResultsInStage(int, int, LocalTime): void
++ getRiderResultsInStage(int, int): LocalTime array
++ getRiderAdjustedElapsedTimeInStage(int, int): LocalTime
++ deleteRiderResultsInStage(int, int): void
++ getRidersRankInStage(int): int array
++ getRankedAdjustedElapsedTimeInStage(int): LocalTime array
++ getRidersPointsInStage(int): int array
++ getRidersMountainPointsInStage(int): int array
++ eraseCyclingPortal(): void
++ saveCyclingPortal(String): void
++ loadCyclingPortal(String): void
+-
+
+
+
+CyclingPortal 
++ removeRaceByName(String): void
++ getRiderGeneralClassificationRank(int): int array
++ getGeneralClassificationTimesInRace(int): LocalTime array
++ getRidersPointsInRace(int): int array
++ getRidersMountainPointsInRace(int): int array
++ getRidersPointClassificationRank(int): int array
++ getRidersMountainPointClassificationRank(int): int array
