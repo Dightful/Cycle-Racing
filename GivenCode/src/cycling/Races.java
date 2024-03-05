@@ -1,6 +1,4 @@
-'''
-This is the Races class that stores Teams, RaceName and Stages as attributes along with its getters and setters
-'''
+
 package cycling;
 import cycling.Stages;
 
@@ -9,6 +7,7 @@ public class Races {
     private Team[] teams;
     private String racename;
     private Stages[] stage;
+    private int id;
 
     public Team[] getTeams() {
         return teams;
@@ -32,5 +31,14 @@ public class Races {
 
     public void setStages(Stages[] stages) {
         this.stage = stages; 
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
