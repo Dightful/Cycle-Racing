@@ -11,6 +11,7 @@ public class Races {
     private Stages[] stage;
     private int id;
     private String description;
+    //private list<list<object>> generalClassification
 
     public Races(String name, String description) {
         this.racename = name;
@@ -132,4 +133,4 @@ public class Races {
     
 }
 
-    
+//Sum of riders times
