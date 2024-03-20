@@ -1,33 +1,47 @@
-'''
+/** 
 This class is used to represent the stages of the race, with the total distance required to be gained by each one
-'''
+*/
+
 package cycling;
-import java.time.LocalDateTime
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Iterator;
+import java.util.List;
 
 public class Stages {
-    private int type;
+    private StageType type; //
     private double length;
     private Checkpoint[] checkpoints;
     private int id;
     private LocalDateTime startTime;
-    private String stageName;
+    private String name;
+    private StageState state;
+    private CheckpointType checkpointtype;
+    private PointsClassification pointsClassification;
 
-    public Stages(int type, double length, Checkpoint[] checkpoints, LocalDateTime startTime, String stageName) {
+    public Stages(String name, String description, double length, LocalDateTime startTime, StageType type) {
         this.type = type;
         this.length = length;
-        this.checkpoints = checkpoints;
         this.startTime = startTime;
-        this.id = generateId();
-        this.stageName = stageName;
+        this.name = name;
     }
 
 
     // getting and setting
-    public int getType() {
+    public CheckpointType getCheckpointType() {
+        return checkpointtype;
+    }
+
+    public void setCheckpointType(CheckpointType checkpointtype) {
+        this.checkpointtype = checkpointtype;
+    }
+
+
+    public StageType getStageType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setStageType(StageType type) {
         this.type = type;
     }
 
@@ -62,32 +76,57 @@ public class Stages {
         this.startTime = startTime;
     }
     public String getStageName() {
-        return stageName;
+        return name;
     }
     public void setStageName(String stageName) {
-        this.stageName = stageName;
+        this.name = stageName;
 
     }
-}
 
-public LocalTime[] getRiderResults(int riderId) {
-    for (Result result : resultsList) {
-        if (result.getRider().getId() == riderId) {
-            return result.getTimes();
+    private List<Result> resultsList;
+
+
+    public LocalTime[] getRiderResults(int riderId) {
+        for (Result result : resultsList) {
+            if (result.getRider().getId() == riderId) {
+                return result.getRiderTimes();
+            }
         }
+        return null;
     }
-    return null;
-}
 
 //need a calculatedAdjustedTime method
 
-public boolean deleteRiderResults(int riderId) {
-    for (Iterator<Result> iterator = resultsList.iterator(); iterator.hasNext();) {
-        Result result = iterator.next();
-        if (result.getRiderId() == riderId) {
-            iterator.remove();
-            return true;
+    public boolean deleteRiderResults(int riderId) {
+        for (Iterator<Result> iterator = resultsList.iterator(); iterator.hasNext();) {
+            Result result = iterator.next();
+            if (result.getRiderId() == riderId) {
+                iterator.remove();
+                return true;
+            }
         }
+        return false;
     }
-    return false;
+
+    public StageState getState() {
+        return state;
+    }
+
+    public void setState(StageState newstate) {
+        this.state = newstate;
+    }
+
+    public List<Result> getResults() {
+        return resultsList;
+    }
+
+    public void calculatePointsClassificaiton(int points) {
+        this.pointsClassification = new PointsClassification(points);
+    }
+
 }
+
+//set stage method
+
+//for each rider
+//get rider id

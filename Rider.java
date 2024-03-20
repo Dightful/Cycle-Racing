@@ -6,11 +6,15 @@ public class Rider {
     private int Age;
     private int id;
     private Team team;
+    private int yearOfBirth;
 
     //constructor
-    public Rider(
+    public Rider(String name, int id, int yearOfBirth) {
+        this.name = name;
+        this.id = id;
+        this.yearOfBirth = yearOfBirth;
 
-
+    }
     //getting and setting
 
     public String getname() {
@@ -54,7 +58,15 @@ public class Rider {
     }
 
     public String toString() {
-        return "Rider: " + Firstname + " " + Lastname; 
+        return "Rider: " + name; 
+    }
+
+    public int getYearOfBirth() {
+        return yearOfBirth;
+    }
+
+    public void setYearOfBirth(int yearOfBirth) {
+        this.yearOfBirth = yearOfBirth;
     }
 
 }

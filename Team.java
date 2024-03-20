@@ -3,20 +3,25 @@ package cycling;
 public class Team {
     private String name;
     private String nationality;
-    private Riders[] riders;
+    private Rider[] riders;
     private int id;
 
-    public Team(String name, int id, String nationality, Riders[] riders) {
+    private String description; 
+
+    public Team(String name, int id, String description) {
         this.name = name;
         this.id = id;
         this.nationality = nationality;
         this.riders = riders;
+        this.description = description;
     }
-    public String getName() {
+
+    
+    public String getTeamName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setTeamName(String name) {
         this.name = name;
     }
 
@@ -28,11 +33,11 @@ public class Team {
         this.nationality = nationality;
     }
 
-    public Riders[] getRiders() {
+    public Rider[] getRiders() {
         return riders;
     }
 
-    public void setRiders(Riders[] riders) {
+    public void setRiders(Rider[] riders) {
         this.riders = riders;
     }
 
@@ -43,4 +48,19 @@ public class Team {
     public void setId(int id) {
         this.id = id;
     }
+    public void addRider(Rider newRider) {
+        if (riders == null) {
+            riders = new Rider[1];
+            riders[0] = newRider;
+        } else {
+            Rider[] newRiders = new Rider[riders.length + 1];
+            System.arraycopy(riders, 0, newRiders, 0, riders.length);
+            newRiders[riders.length] = newRider;
+            riders = newRiders;
+        }
+    }
+
+
 }
+
+//get riders method

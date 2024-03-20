@@ -1,14 +1,14 @@
 
 package cycling;
-import cycling.Stages;
+
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 
 public class Races {
-    private Team[] teams;
+    private Team[] teamsArray;
     private String racename;
-    private Stages[] stage;
+    private Stages[] stagesArray;
     private int id;
     private String description;
     //private list<list<object>> generalClassification
@@ -16,16 +16,16 @@ public class Races {
     public Races(String name, String description) {
         this.racename = name;
         this.description = description;
-        this.id = generateId();
+        
     }
 
 
     public Team[] getTeams() {
-        return teams;
+        return teamsArray;
     }
 
-    public void setTeams(Team[] teams) {
-        this.teams = teams;
+    public void setTeams(Team[] teamsArray) {
+        this.teamsArray = teamsArray;
     }
 
     public String getRacename() {
@@ -37,11 +37,11 @@ public class Races {
     }
 
     public Stages[] getStages() {
-        return stage;
+        return stagesArray;
     }
 
     public void setStages(Stages[] stages) {
-        this.stage = stages; 
+        this.stagesArray = stages; 
     }
 
 
@@ -57,80 +57,115 @@ public class Races {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
     public int getTotalStages() {
-        if (stage != null) {
-            return stage.length;
+        if (stagesArray != null) {
+            return stagesArray.length;
         } else {
             return 0;
         }
     }
 
+
     public void addTeam(Team team) {
-        if (teams == null) {
-            teams = new Team[] { team };
+        if (teamsArray == null) {
+            teamsArray = new Team[] { team };
         } else {
-            List<Team> teamList = new ArrayList<>(Arrays.asList(teams));
+            List<Team> teamList = new ArrayList<>(Arrays.asList(teamsArray));
             teamList.add(team);
-            teams = teamList.toArray(new Team[0]);
+            teamsArray = teamList.toArray(new Team[0]);
         }
     }
 
     public void removeTeam(Team team) {
-        if (teams != null) {
+        if (teamsArray != null) {
             int index = -1;
-            for (int i = 0; i < teams.length; i++) {
-                if (teams[i].equals(team)) {
+            for (int i = 0; i < teamsArray.length; i++) {
+                if (teamsArray[i].equals(team)) {
                     index = i;
                     break;
                 }
             }
             if (index != -1) {
-                Team[] newTeams = new Team[teams.length - 1];
-                for (int i = 0, j = 0; i < teams.length; i++) {
+                Team[] newTeams = new Team[teamsArray.length - 1];
+                for (int i = 0, j = 0; i < teamsArray.length; i++) {
                     if (i != index) {
-                        newTeams[j++] = teams[i];
-                        j++;
+                        newTeams[j++] = teamsArray[i];
+                        
                     }
                 }
-                teams = newTeams;
+                teamsArray = newTeams;
             }
         }
     }
 
     public void addStage(Stages stage) {
-        if (this.stage == null) {
-            this.stage = new Stages[] { stage };
+        if (this.stagesArray == null) {
+            this.stagesArray = new Stages[] { stage };
         }
         else {
-            List<Stages> stageList = new ArrayList<>(Arrays.asList(this.stage));
+            List<Stages> stageList = new ArrayList<>(Arrays.asList(this.stagesArray));
             stageList.add(stage);
-            this.stage = stageList.toArray(new Stages[0]);
+            this.stagesArray = stageList.toArray(new Stages[0]);
         }
     }
 
     public void removeStage(Stages stage) {
-        if (this.stage != null) {
+        if (this.stagesArray != null) {
             int index = -1;
-            for (int i = 0; i < this.stage.length; i++) {
-                if (this.stage[i].equals(stage)) {
+            for (int i = 0; i < this.stagesArray.length; i++) {
+                if (this.stagesArray[i].equals(stage)) {
                     index = i;
                     break;
                 }
             }
             if (index != -1) {
-                Stages[] newStages = new Stages[this.stage.length - 1];
-                for (int i = 0, j = 0; i < this.stage.length; i++) {
+                Stages[] newStages = new Stages[this.stagesArray.length - 1];
+                for (int i = 0, j = 0; i < this.stagesArray.length; i++) {
                     if (i != index) {
-                        newStages[j++] = this.stage[i];
+                        newStages[j++] = this.stagesArray[i];
                         j++;
                     }
                 }
-                this.stage = newStages;
+                this.stagesArray = newStages;
             }
         }
     }
 
-    
-}
+    public String getTeamName(int teamid) {
+        if (teamsArray != null) {
+            for (Team team : teamsArray) {
+                if (team.getId() == teamid) {
+                    return team.getTeamName();
+                }
+            }
+        }
+        return null;
+    }
+//--------------
+    public List<List<Result>> getRaceResults() {
+        List<List<Result>> raceResults = new ArrayList<>();
+        if (this.stagesArray != null) {
+            for (Stages stage : stagesArray) {
+                raceResults.add(stage.getResults());
+            }
+        }
+        return raceResults;
+    }
 
+    
+
+//--------------
 //Sum of riders times
+
+
+
+//Calculate the sum of the points of the riders at the end of the race for points classification
+//Im going to assume I want to sum all of the riders points up and store them in an array that is unsorted
+
+
+}

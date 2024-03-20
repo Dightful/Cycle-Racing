@@ -1,4 +1,8 @@
+
+
 package cycling;
+
+import java.time.LocalTime;
 
 public class Result {
     private int riderId;
@@ -7,6 +11,11 @@ public class Result {
     private int rank;
     private int pointClassificationRank;
     private int mountainPointClassificationRank;
+    private LocalTime[] time;
+    private Rider rider;
+    private LocalTime adjustedTime;
+    private LocalTime stageTime; //I think this is the time it took to complete the stage
+
 
     public Result(int riderId, int points, int mountainPoints, int rank, int pointClassificationRank, int mountainPointClassificationRank) {
         this.riderId = riderId;
@@ -64,5 +73,18 @@ public class Result {
     public void setMountainPointClassificationRank(int mountainPointClassificationRank) {
         this.mountainPointClassificationRank = mountainPointClassificationRank;
     }
-    
+    public LocalTime[] getRiderTimes() {
+        return time;
+    }
+    public Rider getRider() {
+        return rider;
+    }
+    //Dunno if im calculating this or not so leaving it like this for now
+    public LocalTime getAdjustedTime() {
+        return adjustedTime;
+    }
+    public LocalTime getStageTime() {
+        return stageTime;
+    }
+
 }
