@@ -30,13 +30,16 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	//Creates an empty Array of Stages objects
 	private Stages[] stagesArray = new Stages[0];
 	//Creates an empty Array of Rider objects
-	private Rider[] ridersArray = new Rider[0];
+	private Rider[] ridersArray = new Rider[0]; 
+
 
 	//Team counter for team id
 	private int generateteamId() {
 		return teamsArray.length + 1;
 	
 	}
+
+	
 
 	private List<Races> racesList = new ArrayList<>();
 	@Override
@@ -66,6 +69,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 
 		// Create a new race and add it to the list
 		Races newRace = new Races(name, description);
+		//newRace.setId(generateraceId());
 		racesList.add(newRace);
 
 		// Return ID of new race
@@ -455,126 +459,140 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 			}
 		}
 		if (!riderfound) {
-			throw new IDNotRecognisedException("No rider with ID" + riderId + "was found");
+			throw new IDNotRecognisedException("No rider with ID " + riderId + " was found");
 		}
 
 	}
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	@Override
+	@Override//DONE
 	public void registerRiderResultsInStage(int stageId, int riderId, LocalTime... checkpoints)
 			throws IDNotRecognisedException, DuplicatedResultException, InvalidCheckpointTimesException,
 			InvalidStageStateException {
-		
 
+			
+			
+			for (Races race : racesList) {
+				boolean StageFound = false;
+				for (Stages stage : race.getStages()) {
+					if (stage.getId() == stageId) {
+						//Setting variable to true, as stage id found
+						StageFound = true;
+						//Check if the stage is in a state that allows for an intermediate sprint to be added
+						if (stage.getState() != StageState.PREPARATION) {
+							throw new InvalidStageStateException("The stage must be in the PREPARATION state to add a new rider results");
+						}
+
+						stage.AddRidersToList(stageId, riderId, checkpoints);
+
+					}
+				}
+				if (StageFound == false) {
+					throw new IDNotRecognisedException("No Stage with ID " + stageId + " was found");
+				}
+			}
 	}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	@Override
+	@Override// DONE
 	public LocalTime[] getRiderResultsInStage(int stageId, int riderId) throws IDNotRecognisedException {
 		// Declare variable to store the stage
 		Stages foundStage = null;
 
-		for (Stages s : stagesArray) {
-			if (s.getId() == stageId) {
-				foundStage = s;
-				break;
+		for (Stages stage : stagesArray) {
+			if (stage.getId() == stageId) {
+				foundStage = stage;				
 			}
 		}
-		if (stagesArray == null) {
+		// As if foundStage is still null, that means no stage with the given stageId was found
+		if (foundStage == null) {
 			throw new IDNotRecognisedException("No stage with ID " + stageId + " was found");
 		}
 		// Get results of the rider
-		LocalTime[] results = foundStage.getRiderResults(riderId);
+		LocalTime[] results = foundStage.getRiderResultsInStageMethod(stageId,riderId);
 		if (results == null) {
 			throw new IDNotRecognisedException("No rider with ID " + riderId + " was found in stage with ID " + stageId);
 		}
 		return results;
 	}
 
-	@Override
+	@Override// DONE
 	public LocalTime getRiderAdjustedElapsedTimeInStage(int stageId, int riderId) throws IDNotRecognisedException {
 		//Find stage
-		Stages stage = null;
-		for (Stages s : stagesArray) {
-			if (s.getId() == stageId) {
-				stage = s;
+		Stages foundStage = null;
+		for (Stages stage : stagesArray) {
+			if (stage.getId() == stageId) {
+				foundStage = stage;
 				break;
 			}
 		}
-		if (stage == null) {
+		if (foundStage == null) {
 			throw new IDNotRecognisedException("No stage with ID " + stageId + " was found");
 		}
 		// Get the results of the rider
-		LocalTime[] results = stage.getRiderResults(riderId);
-		if (results == null) {
+		LocalTime RiderAdjustedElapsedTime = foundStage.getRiderAdjustedElapsedTimeInStageMethod(stageId,riderId);
+		
+		if (RiderAdjustedElapsedTime == null) {
 			throw new IDNotRecognisedException("No rider with ID " + riderId + " was found in stage with ID " + stageId);
 		}
-		//Calculate the adjusted elapsed time
-		LocalTime adjustedTime = calculateAdjustedTime(results);
-		return adjustedTime;
+		
+		return RiderAdjustedElapsedTime;
 	}
 
-	@Override
+	@Override// DONE
 	public void deleteRiderResultsInStage(int stageId, int riderId) throws IDNotRecognisedException {
 		// Find stage
 		Stages foundStage = null;
-		for (Stages s : stagesArray) {
-			if (s.getId() == stageId) {
-				foundStage = s;
+		for (Stages stage : stagesArray) {
+			if (stage.getId() == stageId) {
+				foundStage = stage;
 				break;
 			}
 		}
-		if (stagesArray == null) {
+		// Throwing excpetion as no stage with Id of parameter stageId found
+		if (foundStage == null) {
 			throw new IDNotRecognisedException("No stage with ID " + stageId + " was found");
 		
 		}
 		// Delete the results of the rider
-		boolean deleted = foundStage.deleteRiderResults(riderId);
+		boolean deleted = foundStage.DeleteRider( stageId, riderId);
 		if (!deleted) {
 			throw new IDNotRecognisedException("No rider with ID " + riderId + " was found in stage with ID " + stageId);
 		}
 
 	}
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	@Override
+	@Override// DONE
 	public int[] getRidersRankInStage(int stageId) throws IDNotRecognisedException {
 		// Find the stage
-		Stages stage = null;
-		for (Stages s : stagesArray) {
-			if (s.getId() == stageId) {
-				stage = s;
+		Stages foundStage = null;
+		for (Stages stage : stagesArray) {
+			if (stage.getId() == stageId) {
+				foundStage = stage;
 				break;
 			}
 		}
-		if (stage == null) {
+		if (foundStage == null) {
 			throw new IDNotRecognisedException("No stage with ID " + stageId + " was found");
 		}
-		// Get the results of the stage
-		List<Result> results = stage.getResults();
-		//Sort results by time
-		Collections.sort(results, new Comparator<Result>() {
-			@Override
-			public int compare(Result r1, Result r2) {
-				return r1.getStageTime().compareTo(r2.getStageTime());
-			}
-		});
-		//Create an array of rider IDs
-		int[] riderIds = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderIds[i] = results.get(i).getRider().getId();
+		int[] RankedRiderIds = foundStage.getRidersRankInStageMethod(stageId);
+		if (RankedRiderIds == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return RankedRiderIds;
 		}
-		return riderIds;
+		
 	}
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	@Override
+	@Override//DONE
 	public LocalTime[] getRankedAdjustedElapsedTimesInStage(int stageId) throws IDNotRecognisedException {
-		// Returns an array of adjusted elapsed times of riders in the given stage
-		// Find the stage
+
+		// Finds the stage
 		Stages foundStage = null;
-		for (Stages s : stagesArray) {
-			if (s.getId() == stageId) {
-				foundStage = s;
+		for (Stages stage : stagesArray) {
+			if (stage.getId() == stageId) {
+				foundStage = stage;
 				break;
 			}
 		}
@@ -582,70 +600,72 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 			throw new IDNotRecognisedException("No stage with ID " + stageId + " was found");
 		}
 		// Get the results of the stage
-		List<Result> results = foundStage.getResults();
-		//Sort results by adjusted elapsed time
-		Collections.sort(results, new Comparator<Result>() {
-			@Override
-			public int compare(Result r1, Result r2) {
-				return r1.getAdjustedTime().compareTo(r2.getAdjustedTime());
-			}
-		});
-		//Create an array of adjusted elapsed times
-		LocalTime[] adjustedTimes = new LocalTime[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			adjustedTimes[i] = results.get(i).getAdjustedTime();
+		LocalTime[] getRankedAdjustedElapsedTimes = foundStage.getRankedAdjustedElapsedTimesInStageMethod(stageId);
+		// If result is null, returns an empty LocalTime array
+		if (getRankedAdjustedElapsedTimes == null) {
+			LocalTime[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return getRankedAdjustedElapsedTimes;
 		}
-		return adjustedTimes;
+
 	}
 
-	@Override
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+//This is is points classification.
+
+	@Override// DONE
 	public int[] getRidersPointsInStage(int stageId) throws IDNotRecognisedException {
-		// Return an array of points earned by riders in the given stage
-		//find the stage
+		// Finds the stage
 		Stages foundStage = null;
-		for (Stages s : stagesArray) {
-			if (s.getId() == stageId) {
-				foundStage = s;
+		for (Stages stage : stagesArray) {
+			if (stage.getId() == stageId) {
+				foundStage = stage;
 				break;
 			}
 		}
+
 		if (foundStage == null) {
 			throw new IDNotRecognisedException("No stage with ID " + stageId + " was found");
 		
 		}
 		//Get results of the stage
-		List<Result> results = foundStage.getResults();
-		//Create an array of rider points
-		int[] riderPoints = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderPoints[i] = results.get(i).getPoints();
+		int[] riderPoints = foundStage.getRidersPointsInStageMethod();
+		if (riderPoints == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		}else {
+			return riderPoints;
 		}
-		return riderPoints;
 	}
 
-	@Override
+	@Override// DONE
 	public int[] getRidersMountainPointsInStage(int stageId) throws IDNotRecognisedException {
-		// Return an array of mountain points earned by riders in the given stage
-		//find the stage
+		// Finds the stage
 		Stages foundStage = null;
-		for (Stages s : stagesArray) {
-			if (s.getId() == stageId) {
-				foundStage = s;
+		for (Stages stage : stagesArray) {
+			if (stage.getId() == stageId) {
+				foundStage = stage;
 				break;
 			}
 		}
+
 		if (foundStage == null) {
 			throw new IDNotRecognisedException("No stage with ID " + stageId + " was found");
+		
 		}
-		// Get the results of the stage
-		List<Result> results = foundStage.getResults();
-		//Create an array of rider mountain points
-		int[] riderMountainPoints = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderMountainPoints[i] = results.get(i).getMountainPoints();
+		//Get results of the stage
+		int[] riderPoints = foundStage.getRidersMountainPointsInStage();
+		if (riderPoints == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		}else {
+			return riderPoints;
 		}
-		return riderMountainPoints;
 	}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	@Override
 	public void eraseCyclingPortal() {
@@ -705,32 +725,35 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	@Override
+	@Override// DONE
 	public LocalTime[] getGeneralClassificationTimesInRace(int raceId) throws IDNotRecognisedException {
 		// Returns an array of general classification times of riders in the given race
 		// Find the race
-		Races race = null;
-		for (Races r : racesList) {
-			if (r.getId() == raceId) {
-				race = r;
+		Races foundRace = null;
+		for (Races race : racesList) {
+			if (race.getId() == raceId) {
+				foundRace = race;
 				break;
 			}
 		}
-		if (race == null) {
+		if (foundRace == null) {
 			throw new IDNotRecognisedException("No race with ID " + raceId + " was found");
 		}
-		// Get the results of the race
-		List<Result> results = race.getRaceResults();
-		// Create an array of general classification times
-		LocalTime[] generalClassificationTimes = new LocalTime[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			generalClassificationTimes[i] = results.get(i).getGeneralClassificationTime();
-
+		// get the summed times of all stages for the race
+		LocalTime[] RankedSumOfAdjustedElapasedTimes = foundRace.getGeneralClassificationTimesInRacemethod();
+		// Checking if it is null then, return empty array.
+		if (RankedSumOfAdjustedElapasedTimes == null) {
+			LocalTime[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return RankedSumOfAdjustedElapasedTimes;
 		}
-		return generalClassificationTimes;
 	}
 
-	@Override
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+//This is is points classification.
+
+	@Override// DONE
 	public int[] getRidersPointsInRace(int raceId) throws IDNotRecognisedException {
 		// Find the race
 		Races race = null;
@@ -744,17 +767,19 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 			throw new IDNotRecognisedException("No race with ID" + raceId + "was found");
 
 		}
-		// Get the results of the race
-		List<Result> results = race.getRaceResults();
-		// Create an array of rider points
-		int[] riderPoints = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderPoints[i] = results.get(i).getPoints();
-		}
-		return riderPoints;
+		
+		int[] RidersPointsRanked = race.getRidersPointsInRace();
+
+		if (RidersPointsRanked == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return RidersPointsRanked;
+		} 
+
 	}
 
-	@Override
+	@Override//DONE
 	public int[] getRidersMountainPointsInRace(int raceId) throws IDNotRecognisedException {
 		// Find the race
 		Races race = null;
@@ -766,86 +791,95 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		}
 		if (race == null) {
 			throw new IDNotRecognisedException("No race with ID" + raceId + "was found");
+
 		}
-		// Get the results of the race
-		List<Result> results = race.getRaceResults();
-		// Create an array of rider mountain points
-		int[] riderMountainPoints = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderMountainPoints[i] = results.get(i).getMountainPoints();
+		
+		int[] RidersPointsRanked = race.getRidersMountainPointsInRace();
+
+		if (RidersPointsRanked == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return RidersPointsRanked;
 		}
-		return riderMountainPoints;
 	}
 
-	@Override
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+
+
+	@Override// DONE
 	public int[] getRidersGeneralClassificationRank(int raceId) throws IDNotRecognisedException {
 		// find the race
-		Races race = null;
-		for (Races r : racesList) {
-			if (r.getId() == raceId) {
-				race = r;
+		Races foundRace = null;
+		for (Races race : racesList) {
+			if (race.getId() == raceId) {
+				foundRace = race;
 				break;
 			}
 		}
-		if (race == null) {
+		if (foundRace == null) {
 			throw new IDNotRecognisedException("No race with ID" + raceId + "was found");
 		}
-		//Get the results of the race
-		List<Result> results = race.getRaceResults();
-		//Create an array of rider general classification ranks
-		int[] riderGeneralClassificationRanks = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderGeneralClassificationRanks[i] = results.get(i).getGeneralClassificationRank();
+		// get the ranked Id's based off of their sum of adjusted elapsed times in all stages
+		int[] RankedRiderIds = foundRace.getRidersGeneralClassificationRankMethod();
+		// Checking if it is null then, return empty array.
+		if (RankedRiderIds == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return RankedRiderIds;
 		}
-		return riderGeneralClassificationRanks;
+
 	}
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+//This is is points classification.
 
-
-	@Override
+	@Override// DONE
 	public int[] getRidersPointClassificationRank(int raceId) throws IDNotRecognisedException {
 		// Find the race
-		Races race = null;
-		for (Races r : racesList) {
-			if (r.getId() == raceId) {
-				race = r;
+		Races foundRace = null;
+		for (Races race : racesList) {
+			if (race.getId() == raceId) {
+				foundRace = race;
 				break;
 			}
 		}
-		if (race == null) {
+		if (foundRace == null) {
 			throw new IDNotRecognisedException("No race with ID" + raceId + "was found");
 		}
-		// Get the results of the race
-		List<Result> results = race.getResults();
-		// Create an array of rider point classification ranks
-		int[] riderPointClassificationRanks = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderPointClassificationRanks[i] = results.get(i).getPointClassificationRank();
-		}
-		return riderPointClassificationRanks;
+		
+		int[] RankedListOfIds = foundRace.getRidersPointClassificationRank();
+		if (RankedListOfIds == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return RankedListOfIds;
+		} 
+
 	}
 
-	@Override
+	@Override//DONE
 	public int[] getRidersMountainPointClassificationRank(int raceId) throws IDNotRecognisedException {
 		// Find the race
-		Races race = null;
-		for (Race r : racesList) {
-			if (r.getId() == raceId) { 
-				race = r;
+		Races foundRace = null;
+		for (Races race : racesList) {
+			if (race.getId() == raceId) {
+				foundRace = race;
 				break;
 			}
 		}
-		if (race == null) {
+		if (foundRace == null) {
 			throw new IDNotRecognisedException("No race with ID" + raceId + "was found");
 		}
-		// Get the results of the race
-		List<Result> results = race.getResults();
-		// Create an array of rider mountain point classification ranks
-		int[] riderMountainPointClassificationRanks = new int[results.size()];
-		for (int i = 0; i < results.size(); i++) {
-			riderMountainPointClassificationRanks[i] = results.get(i).getMountainPointClassificationRank();
+		
+		int[] RankedListOfIds = foundRace.getRidersMountainPointClassificationRank();
+		if (RankedListOfIds == null) {
+			int[] EmptyArray = {};
+			return EmptyArray;
+		} else {
+			return RankedListOfIds;
 		}
-		return riderMountainPointClassificationRanks;
 	}
 
 }
