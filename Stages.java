@@ -27,6 +27,8 @@ public class Stages {
     private List<List<Object>> ResultsList = new ArrayList<>();
     private Map<Integer, Integer> RidersPoints = new HashMap<Integer, Integer>();
     private Map<Integer, Integer> RidersPointsMountain = new HashMap<Integer, Integer>();
+    private List<CategorizedClimb> categorizedClimbs = new ArrayList<>();
+    private List<IntermediateSprint> intermediateSprints = new ArrayList<>();
 
 
     public Stages(String name, String description, double length, LocalDateTime startTime, StageType stageType) {
@@ -809,8 +811,13 @@ public class Stages {
         return PointsArray;
     }
 
+    public void addCategorizedClimb(CategorizedClimb climb) {
+        categorizedClimbs.add(climb);
+    }
 
-     
+    public void addIntermediateSprint(IntermediateSprint sprint) {
+        intermediateSprints.add(sprint);
+    }
 
 }
 

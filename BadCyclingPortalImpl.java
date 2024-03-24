@@ -229,8 +229,8 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		for (Races race : racesList){
 			for (Stages stage : race.getStages()) {
 				// Check if stage type is suitable for adding a categorized climb
-				if (stage.getStageType() != StageType.C1) {
-					throw new InvalidStageTypeException("The stage type must be MOUNTAIN to add a categorized climb");
+				if (stage.getCheckpointType() != CheckpointType.C1 && stage.getCheckpointType() != CheckpointType.C2 && stage.getCheckpointType() != CheckpointType.C3 && stage.getCheckpointType() != CheckpointType.C4 && stage.getCheckpointType() != CheckpointType.HC){
+					throw new InvalidStageTypeException("The stage type must be C1, C2, C3, C4, HC to add a categorized climb");
 				}
 				//Check if the stage is in a state that allows for a categorized climb to be added
 				if (stage.getState() != StageState.PREPARATION) {
@@ -276,7 +276,6 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		}
 		throw new IDNotRecognisedException("No stage with ID" + stageId + "was found");
 	}
-
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	@Override
 	public void removeCheckpoint(int checkpointId) throws IDNotRecognisedException, InvalidStageStateException {
