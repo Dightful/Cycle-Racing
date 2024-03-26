@@ -83,8 +83,8 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 			if (race.getId() == raceId) {
 				// Format details
 				String details = "Name: " + race.getRacename() +
-				                 "\nDescription" + race.getDescription() +
-								 "\n Total Stages: " + race.getTotalStages();
+				                 "\nDescription" + race.getDescription();
+								 
 				return details;
 			}
 		}
@@ -150,9 +150,18 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 				// Create a new stage and add it to the race
 				Stages newStage = new Stages(name, description, length, startTime, type);
 				race.addStage(newStage);
+				//Add to stages array
+				//Converting stages to list
+				List<Stages> TempStagesList = new ArrayList<>(Arrays.asList(StagesArray));
+				//Adding new stage to list
+				TempStagesList.add(newStage);
+				//Converting list to array
+				Stages[] TempStagesArray = new Stages[TempStagesList.size()];
+				for (int i = 0; i< TempStagesList.size(); i++){
+					TempStagesArray[i] = TempStagesList.get(i);
+				}
+				StagesArray = TempStagesArray;
 
-				// Return ID of new stage
-				return newStage.getId();
 			}
 		}
 
