@@ -1,18 +1,19 @@
 package cycling;
 
 public class Checkpoint {
-    private int id; 
+    private int CheckpointId; 
     private CheckpointType checkpointType;
 
 
     //Constructor
-    public Checkpoint(int id, CheckpointType checkpointType) {
-        this.id = id;
+    public Checkpoint(int CheckpointId, CheckpointType checkpointType) {
+        this.CheckpointId = CheckpointId;
         this.checkpointType = checkpointType;
     }
 
+    //Get Checkpoint Id
     public int getCheckpointId() {
-        return id;
+        return CheckpointId;
     }
 
     //Create an instance of checkpointType

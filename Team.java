@@ -2,20 +2,24 @@ package cycling;
 
 public class Team {
     private String name;
-    private String nationality;
-    private Rider[] riders;
-    private int id;
+    private String Nationality;
+    private Rider[] Riders;
+    private int TeamId;
+    private String Description; 
 
-    private String description; 
-
-    public Team(String name, int id, String description) {
+    public Team(String name, int TeamId, String Description) {
         this.name = name;
-        this.id = id;
-        this.nationality = nationality;
-        this.riders = riders;
-        this.description = description;
+        this.TeamId = TeamId;
+        this.Description = Description;
+    }
+    // Getters and setters for all attributes
+    public String getDescription() {
+        return Description;
     }
 
+    public void setDescription(String Description) {
+        this.Description = Description;
+    }
     
     public String getTeamName() {
         return name;
@@ -26,41 +30,49 @@ public class Team {
     }
 
     public String getNationality() {
-        return nationality;
+        return Nationality;
     }
 
-    public void setNationality(String nationality) {
-        this.nationality = nationality;
+    public void setNationality(String Nationality) {
+        this.Nationality = Nationality;
     }
 
     public Rider[] getRiders() {
-        return riders;
+        return Riders;
     }
 
-    public void setRiders(Rider[] riders) {
-        this.riders = riders;
+    public void setRiders(Rider[] Riders) {
+        this.Riders = Riders;
     }
 
     public int getId() {
-        return id;
+        return TeamId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int TeamId) {
+        this.TeamId = TeamId;
     }
+
     public void addRider(Rider newRider) {
-        if (riders == null) {
-            riders = new Rider[1];
-            riders[0] = newRider;
-        } else {
-            Rider[] newRiders = new Rider[riders.length + 1];
-            System.arraycopy(riders, 0, newRiders, 0, riders.length);
-            newRiders[riders.length] = newRider;
-            riders = newRiders;
-        }
+    // If the list of riders is currently empty
+    if (Riders == null) {
+        // Create a new array with a size of 1 and add the new rider
+        Riders = new Rider[1];
+        Riders[0] = newRider;
+    } else {
+        // If the list of riders is not empty
+        // Create a new array with a size one greater than the current list
+        Rider[] newRiders = new Rider[Riders.length + 1];
+        // Copy the existing riders to the new array
+        System.arraycopy(Riders, 0, newRiders, 0, Riders.length);
+        // Add the new rider to the end of the new array
+        newRiders[Riders.length] = newRider;
+        // Update the reference to the list of riders to point to the new array
+        Riders = newRiders;
     }
+}
 
 
 }
 
-//get riders method
+//get Riders method

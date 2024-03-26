@@ -16,6 +16,8 @@ public class CategorizedClimb {
         this.length = length;
     }
 
+    // Getter and setters of all the attributes
+
     public int getId() {
         return id;
     }

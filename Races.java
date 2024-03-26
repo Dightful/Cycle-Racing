@@ -11,138 +11,175 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class Races {
-    private Team[] teamsArray;
-    private String racename;
-    private Stages[] stagesArray;
-    private int id;
-    private String description;
-
-    public Races(String name, String description) {
-        this.racename = name;
-        this.description = description;
+    private Team[] TeamsArray;
+    private String Racename;
+    private Stages[] StagesArray;
+    private int StageId;
+    private String Description;
+    public Races(String name, String Description) {
+        
+        this.Racename = name;
+        this.Description = Description;
         
     }
 
+    // getters and setters for all attributes
 
     public Team[] getTeams() {
-        return teamsArray;
+        return TeamsArray;
     }
 
-    public void setTeams(Team[] teamsArray) {
-        this.teamsArray = teamsArray;
+    public void setTeams(Team[] TeamsArray) {
+        this.TeamsArray = TeamsArray;
     }
 
     public String getRacename() {
-        return racename;
+        return Racename;
     }
 
-    public void setRacename(String racename) {
-        this.racename = racename;
+    public void setRacename(String Racename) {
+        this.Racename = Racename;
     }
 
     public Stages[] getStages() {
-        return stagesArray;
+        return StagesArray;
     }
 
     public void setStages(Stages[] stages) {
-        this.stagesArray = stages; 
+        this.StagesArray = stages; 
     }
 
 
     public int getId() {
-        return id;
+        return StageId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int StageId) {
+        this.StageId = StageId;
     }
 
     public String getDescription() {
-        return description;
+        return Description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(String Description) {
+        this.Description = Description;
     }
 
-
+    // returns the number of stages in the race.
     public int getTotalStages() {
-        if (stagesArray != null) {
-            return stagesArray.length;
+        if (StagesArray != null) {
+            return StagesArray.length;
         } else {
             return 0;
         }
     }
 
-
+    // Checks if that team is in the array, if not then it is appened to the List copy of the array, which is then reverted back to array.
     public void addTeam(Team team) {
-        if (teamsArray == null) {
-            teamsArray = new Team[] { team };
+        if (TeamsArray == null) {
+            TeamsArray = new Team[] { team };
         } else {
-            List<Team> teamList = new ArrayList<>(Arrays.asList(teamsArray));
+            List<Team> teamList = new ArrayList<>(Arrays.asList(TeamsArray));
             teamList.add(team);
-            teamsArray = teamList.toArray(new Team[0]);
+            TeamsArray = teamList.toArray(new Team[0]);
         }
     }
+
 
     public void removeTeam(Team team) {
-        if (teamsArray != null) {
+        // Checking if TeamsArray is not null to avoid NullPointerException
+        if (TeamsArray != null) {
+            // Initializing index to -1 to indicate that the team was not found initially
             int index = -1;
-            for (int i = 0; i < teamsArray.length; i++) {
-                if (teamsArray[i].equals(team)) {
+            
+            // Looping through the TeamsArray to find the index of the team to be removed
+            for (int i = 0; i < TeamsArray.length; i++) {
+                // Checking if the current element in TeamsArray is equal to the team to be removed
+                if (TeamsArray[i].equals(team)) {
+                    // Setting index to the current value of i if team is found
                     index = i;
+                    // Exiting the loop since the team is found
                     break;
                 }
             }
+            
+            // If the team was found
             if (index != -1) {
-                Team[] newTeams = new Team[teamsArray.length - 1];
-                for (int i = 0, j = 0; i < teamsArray.length; i++) {
+                // Creating a new array to hold the teams after removing the specified team
+                Team[] newTeams = new Team[TeamsArray.length - 1];
+                
+                // Copying the teams before the removed team into the new array
+                for (int i = 0, j = 0; i < TeamsArray.length; i++) {
+                    // Skipping the element at the index where the team is to be removed
                     if (i != index) {
-                        newTeams[j++] = teamsArray[i];
-                        
+                        newTeams[j++] = TeamsArray[i];
                     }
                 }
-                teamsArray = newTeams;
+                
+                // Assigning the new array to TeamsArray, effectively removing the specified team
+                TeamsArray = newTeams;
             }
         }
     }
+    
+    // Checks if that stage is in the array, if not then it is appened to the List copy of the array, which is then reverted back to array.
 
     public void addStage(Stages stage) {
-        if (this.stagesArray == null) {
-            this.stagesArray = new Stages[] { stage };
+        if (this.StagesArray == null) {
+            this.StagesArray = new Stages[] { stage };
         }
         else {
-            List<Stages> stageList = new ArrayList<>(Arrays.asList(this.stagesArray));
+            List<Stages> stageList = new ArrayList<>(Arrays.asList(this.StagesArray));
             stageList.add(stage);
-            this.stagesArray = stageList.toArray(new Stages[0]);
+            this.StagesArray = stageList.toArray(new Stages[0]);
         }
     }
 
+    
     public void removeStage(Stages stage) {
-        if (this.stagesArray != null) {
+        // Check if StagesArray is not null to avoid NullPointerException
+        if (this.StagesArray != null) {
+            // Initialize index to -1 to indicate that the stage was not found initially
             int index = -1;
-            for (int i = 0; i < this.stagesArray.length; i++) {
-                if (this.stagesArray[i].equals(stage)) {
+            
+            // Loop through the StagesArray to find the index of the stage to be removed
+            for (int i = 0; i < this.StagesArray.length; i++) {
+                // Check if the current element in StagesArray is equal to the stage to be removed
+                if (this.StagesArray[i].equals(stage)) {
+                    // Set index to the current value of i if stage is found
                     index = i;
+                    // Exit the loop since the stage is found
                     break;
                 }
             }
+            
+            // If the stage was found
             if (index != -1) {
-                Stages[] newStages = new Stages[this.stagesArray.length - 1];
-                for (int i = 0, j = 0; i < this.stagesArray.length; i++) {
+                // Create a new array to hold the stages after removing the specified stage
+                Stages[] newStages = new Stages[this.StagesArray.length - 1];
+                
+                // Copy the stages before the removed stage into the new array
+                for (int i = 0, j = 0; i < this.StagesArray.length; i++) {
+                    // Skip the element at the index where the stage is to be removed
                     if (i != index) {
-                        newStages[j++] = this.stagesArray[i];
+                        // Assign the current element from StagesArray to newStages at index j
+                        newStages[j++] = this.StagesArray[i];
+                        // Increment j to move to the next index in newStages
                         j++;
                     }
                 }
-                this.stagesArray = newStages;
+                
+                // Assign the new array to StagesArray, effectively removing the specified stage
+                this.StagesArray = newStages;
             }
         }
     }
 
+    // If team id matches the one in the Teams array, the Team name is returned.
     public String getTeamName(int teamid) {
-        if (teamsArray != null) {
-            for (Team team : teamsArray) {
+        if (TeamsArray != null) {
+            for (Team team : TeamsArray) {
                 if (team.getId() == teamid) {
                     return team.getTeamName();
                 }
@@ -150,16 +187,7 @@ public class Races {
         }
         return null;
     }
-//--------------
-    public List<List<Result>> getRaceResults() {
-        List<List<Result>> raceResults = new ArrayList<>();
-        if (this.stagesArray != null) {
-            for (Stages stage : stagesArray) {
-                raceResults.add(stage.getResults());
-            }
-        }
-        return raceResults;
-    }
+
     
     public List<Map<Integer,Integer>> GetAllStagesPoints() {
         // Iterating thorugh all the stages, putting all the results into one big List.
@@ -167,7 +195,7 @@ public class Races {
         List<Map<Integer,Integer>> allStageMaps = new ArrayList<>();
         
         // Iterate through the array of Stages objects
-        for (Stages stage : stagesArray) {
+        for (Stages stage : StagesArray) {
             // Assigning the points to the riders.
             stage.AssignPointsToRiders();
             // Access the attribute containing the list of lists
@@ -186,7 +214,7 @@ public class Races {
         List<Map<Integer,Integer>> allStageMaps = new ArrayList<>();
         
         // Iterate through the array of Stages objects
-        for (Stages stage : stagesArray) {
+        for (Stages stage : StagesArray) {
             // Assigning the points to the riders.
             stage.AssignMountainPointsToRiders();
             // Access the attribute containing the list of lists
@@ -204,7 +232,7 @@ public class Races {
         List<List<Object>> allStageSublists = new ArrayList<>();
 
         // Iterate through the array of Stages objects
-        for (Stages stage : stagesArray) {
+        for (Stages stage : StagesArray) {
             // Access the attribute containing the list of lists
             List<List<Object>> StageData = stage.getResultsList();
             
@@ -433,7 +461,7 @@ public class Races {
 
         for (int RiderId: RankOfRiders) {
             int SumOfMountainPoints = 0;
-            // Iterating through the maps inthe list, to gather all the points for that rider
+            // Iterating through the maps in the list, to gather all the points for that rider
             for (Map<Integer,Integer> SublistMap : AllPointsToRiders) {
                 for (Map.Entry<Integer, Integer> entry : SublistMap.entrySet()) {
                     Integer key = entry.getKey();
@@ -471,24 +499,4 @@ public class Races {
     }
     
     
-    // public List<List<Object>> registerRiderResultsInStage(int stageId, int riderId, LocalTime[] checkpoints) {
-
-    //     List<List<Object>> RankingList = generalClassification.GetRanking();
-
-    //     RankingList = generalClassification.AddRidersToList(RankingList, stageId, riderId, checkpoints);
-
-    //     return RankingList;
-
-    // }
-
-    
-
-//--------------
-//Sum of riders times
-
-
-
-//Calculate the sum of the points of the riders at the end of the race for points classification
-//Im going to assume I want to sum all of the riders points up and store them in an array that is unsorted
-
 }

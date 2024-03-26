@@ -4,18 +4,18 @@ public class Rider {
     private String name;
     private String Nationality;
     private int Age;
-    private int id;
+    private int RiderId;
     private Team team;
-    private int yearOfBirth;
+    private int YearOfBirth;
 
     //constructor
-    public Rider(String name, int id, int yearOfBirth) {
+    public Rider(String name, int RiderId, int YearOfBirth) {
         this.name = name;
-        this.id = id;
-        this.yearOfBirth = yearOfBirth;
+        this.RiderId = RiderId;
+        this.YearOfBirth = YearOfBirth;
 
     }
-    //getting and setting
+    //getting and setting for all attributes
 
     public String getname() {
         return name;
@@ -42,11 +42,11 @@ public class Rider {
     }
 
     public int getId() {
-        return id;
+        return RiderId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int RiderId) {
+        this.RiderId = RiderId;
     }
 
     public Team getTeam() {
@@ -56,17 +56,18 @@ public class Rider {
     public void setTeam(Team team) {
         this.team = team;
     }
+    
+    public int getYearOfBirth() {
+        return YearOfBirth;
+    }
 
+    public void setYearOfBirth(int YearOfBirth) {
+        this.YearOfBirth = YearOfBirth;
+    }
+
+    // Returning the name in a more readable format
     public String toString() {
         return "Rider: " + name; 
-    }
-
-    public int getYearOfBirth() {
-        return yearOfBirth;
-    }
-
-    public void setYearOfBirth(int yearOfBirth) {
-        this.yearOfBirth = yearOfBirth;
     }
 
 }
