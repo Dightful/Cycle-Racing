@@ -45,15 +45,14 @@ public class BadCyclingPortalImpl implements CyclingPortal {
     private List<Races> racesList = new ArrayList<>();
 
     // Returns an array of race IDs
-    @Override
-    public int[] getRaceIds() {
-        int[] raceIds = new int[racesList.size()];
-        for (int i = 0; i < racesList.size(); i++) {
-            raceIds[i] = racesList.get(i).getId();
-        }
-        return raceIds;
-    }
-
+	@Override
+	public int[] getRaceIds() {
+		int[] raceIds = new int[RacesArray.length];
+		for (int i = 0; i < RacesArray.length; i++) {
+			raceIds[i] = RacesArray[i].getId();
+		}
+		return raceIds;
+	}
 
 	@Override
 	// I need name, teams, id, description, totalstages
@@ -187,7 +186,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	@Override
 	public int[] getRaceStages(int raceId) throws IDNotRecognisedException {
 		// Iterate through the list of races
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			// Check if the current race has the specified ID
 			if (race.getId() == raceId) {
 				// Retrieve the stages associated with the race
@@ -209,7 +208,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 
 	public double getStageLength(int stageId) throws IDNotRecognisedException {
 		// Iterate through the list of races
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			// Iterate through the stages of each race
 			for (Stages stage : race.getStages()) {
 				// Check if the current stage has the specified ID
@@ -229,7 +228,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		boolean stageFound = false;
 		
 		// Iterate through the list of races
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			// Retrieve the array of stages for the current race
 			Stages[] stages = race.getStages();
 			
@@ -279,7 +278,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	public int addCategorizedClimbToStage(int stageId, Double location, CheckpointType type, Double averageGradient,
 			Double length) throws IDNotRecognisedException, InvalidLocationException, InvalidStageStateException,
 			InvalidStageTypeException {
-		for (Races race : racesList){
+		for (Races race : RacesArray){
 			for (Stages stage : race.getStages()) {
 				// Check if stage type is suitable for adding a categorized climb
 				if (stage.getCurrentCheckpointType() != CheckpointType.C1 && stage.getCurrentCheckpointType() != CheckpointType.C2 && stage.getCurrentCheckpointType() != CheckpointType.C3 && stage.getCurrentCheckpointType() != CheckpointType.C4 && stage.getCurrentCheckpointType() != CheckpointType.HC){
@@ -307,7 +306,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	@Override
 	public int addIntermediateSprintToStage(int stageId, double location) throws IDNotRecognisedException,
 			InvalidLocationException, InvalidStageStateException, InvalidStageTypeException {
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			for (Stages stage : race.getStages()) {
 				// Check if stage type is suitable for adding an intermediate sprint
 				if (stage.getCurrentCheckpointType() != CheckpointType.SPRINT) {
@@ -332,7 +331,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	@Override
 	public void removeCheckpoint(int checkpointId) throws IDNotRecognisedException, InvalidStageStateException {
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			for (Stages stage : race.getStages()) {
 				Checkpoint[] checkpoints = stage.getCheckpoints();
 				for (int i = 0; i < checkpoints.length; i++) {
@@ -365,7 +364,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	@Override
 	public void concludeStagePreparation(int stageId) throws IDNotRecognisedException, InvalidStageStateException {
 		boolean stageFound = false;
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			for (Stages stage : race.getStages()) {
 				if (stage.getId() == stageId) {
 					//Check if the stage is in the PREPARATION state
@@ -390,8 +389,8 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public int[] getStageCheckpoints(int stageId) throws IDNotRecognisedException {
-		// Iterate through the racesList to find the stage with the given ID
-		for (Races race : racesList) {
+		// Iterate through the RacesArray to find the stage with the given ID
+		for (Races race : RacesArray) {
 			for (Stages stage : race.getStages()) {
 				// Check if the current stage has the specified ID
 				if (stage.getId() == stageId) {
@@ -584,7 +583,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	@Override//DONE
 	public void registerRiderResultsInStage(int stageId, int riderId, LocalTime... checkpoints) throws IDNotRecognisedException, DuplicatedResultException, InvalidCheckpointTimesException, InvalidStageStateException {
 			
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			boolean StageFound = false;
 			for (Stages stage : race.getStages()) {
 				if (stage.getId() == stageId) {
@@ -827,7 +826,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	public void removeRaceByName(String name) throws NameNotRecognisedException {
 		// Removes a race from the races list based on a name
 		Races raceToRemove = null;
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			if (race.getRacename().equals(name)) {
 				raceToRemove = race;
 				break;
@@ -836,7 +835,9 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		if (raceToRemove == null) {
 			throw new NameNotRecognisedException("No race with name" + name + "was found");
 		}
+		List<Races> racesList = new ArrayList<>(Arrays.asList(RacesArray));
 		racesList.remove(raceToRemove);
+		RacesArray = racesList.toArray(new Races[0]);
 
 	}
 
@@ -848,7 +849,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		// Returns an array of general classification times of riders in the given race
 		// Find the race
 		Races foundRace = null;
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			if (race.getId() == raceId) {
 				foundRace = race;
 				break;
@@ -875,7 +876,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	public int[] getRidersPointsInRace(int raceId) throws IDNotRecognisedException {
 		// Find the race with the given race ID
 		Races race = null;
-		for (Races r : racesList) {
+		for (Races r : RacesArray) {
 			if (r.getId() == raceId) {
 				race = r;
 				break;
@@ -901,7 +902,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	public int[] getRidersMountainPointsInRace(int raceId) throws IDNotRecognisedException {
 		// Find the race with the given race ID
 		Races race = null;
-		for (Races r : racesList) {
+		for (Races r : RacesArray) {
 			if (r.getId() == raceId) {
 				race = r;
 				break;
@@ -930,7 +931,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	public int[] getRidersGeneralClassificationRank(int raceId) throws IDNotRecognisedException {
 		// find the race
 		Races foundRace = null;
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			if (race.getId() == raceId) {
 				foundRace = race;
 				break;
@@ -958,7 +959,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	public int[] getRidersPointClassificationRank(int raceId) throws IDNotRecognisedException {
 		// Find the race with the given race ID
 		Races foundRace = null;
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			if (race.getId() == raceId) {
 				foundRace = race;
 				break;
@@ -984,7 +985,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	public int[] getRidersMountainPointClassificationRank(int raceId) throws IDNotRecognisedException {
 		// Find the race with the given race ID
 		Races foundRace = null;
-		for (Races race : racesList) {
+		for (Races race : RacesArray) {
 			if (race.getId() == raceId) {
 				foundRace = race;
 				break;
