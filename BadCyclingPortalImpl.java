@@ -28,7 +28,9 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	//Creates an empty Array of Stages objects
 	private Stages[] StagesArray = new Stages[0];
 	//Creates an empty Array of Rider objects
-	private Rider[] RidersArray = new Rider[0]; 
+	private Rider[] RidersArray = new Rider[0];
+	//Create a races array
+	private Races[] RacesArray = new Races[0];
 
 
 	//Team counter for team id
@@ -70,8 +72,18 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 
 		// Create a new race and add it to the list
 		Races newRace = new Races(name, description);
-		//newRace.setId(generateraceId());
 		racesList.add(newRace);
+		List<Races> TempRacesList = new ArrayList<>(racesList);
+				//Adding new stage to list
+				TempRacesList.add(newRace);
+				//Converting list to array
+				Races[] TempRacesArray = new Races[TempRacesList.size()];
+				for (int i = 0; i< TempRacesList.size(); i++){
+					TempRacesArray[i] = TempRacesList.get(i);
+				}
+				RacesArray = TempRacesArray;
+				
+		
 
 		// Return ID of new race
 		return newRace.getId();
@@ -83,7 +95,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 			if (race.getId() == raceId) {
 				// Format details
 				String details = "Name: " + race.getRacename() +
-				                 "\nDescription" + race.getDescription();
+				                 "\nDescription: " + race.getDescription();
 								 
 				return details;
 			}
@@ -161,8 +173,10 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 					TempStagesArray[i] = TempStagesList.get(i);
 				}
 				StagesArray = TempStagesArray;
-
+				return newStage.getId();
+			
 			}
+
 		}
 
 		// If the race with the given ID is not found, throw an exception
