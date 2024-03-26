@@ -188,34 +188,32 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		throw new IDNotRecognisedException("No stage with ID" + stageId + "was found");
 	}
 
-	@Override
-	public void removeStageById(int stageId) throws IDNotRecognisedException {
-		boolean stageFound = false;
-		for (Races race : racesList) {
-			Stages[] stages = race.getStages();
-			for (int i = 0; i < stages.length; i++) {
-				if (stages[i].getId() == stageId) {
-					Stages[] newStages = new Stages[stages.length - 1];
-					for (int j = 0, k = 0; j < stages.length; j++) {
-						if (j != i) {
-							newStages[k++] = stages[j];
-					}
-				}
-				race.setStages(newStages);
-				stageFound = true;
-				break;
-			
-			}
-		}
-		if (stageFound) {
-			break;
-		}
-	}
-	if (!stageFound) {
-		throw new IDNotRecognisedException("No stage with ID" + stageId + "was found");
-	}
-
-	}
+@Override
+public void removeStageById(int stageId) throws IDNotRecognisedException {
+    boolean stageFound = false;
+    for (Races race : racesList) {
+        Stages[] stages = race.getStages();
+        for (int i = 0; i < stages.length; i++) {
+            if (stages[i].getId() == stageId) {
+                Stages[] newStages = new Stages[stages.length - 1];
+                for (int j = 0, k = 0; j < stages.length; j++) {
+                    if (j != i) {
+                        newStages[k++] = stages[j];
+                    }
+                }
+                race.setStages(newStages);
+                stageFound = true;
+                break;
+            }
+        }
+        if (stageFound) {
+            break;
+        }
+    }
+    if (!stageFound) {
+        throw new IDNotRecognisedException("No stage with ID" + stageId + "was found");
+    }
+}
 
 
 	
