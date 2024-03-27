@@ -10,6 +10,8 @@ public class IntermediateSprint {
         this.location = location;
     }
 
+    // Getter and setter
+
     public int getId() {
         return id;
     }

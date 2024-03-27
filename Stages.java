@@ -5,12 +5,10 @@ This class is used to represent the stages of the race, with the total distance 
 package cycling;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +16,7 @@ import java.util.Map;
 public class Stages {
     private StageType stageType; //
     private double length;
+    private List<Integer> checkpointIds = new ArrayList<>();
     private Checkpoint[] checkpoints;
     private int id;
     private LocalDateTime startTime;
@@ -30,7 +29,6 @@ public class Stages {
     private List<CategorizedClimb> categorizedClimbs = new ArrayList<>();
     private List<IntermediateSprint> intermediateSprints = new ArrayList<>();
 
-
     public Stages(String name, String description, double length, LocalDateTime startTime, StageType stageType) {
         this.stageType = stageType;
         this.length = length;
@@ -39,12 +37,12 @@ public class Stages {
     }
 
 
-    // getting and setting
-    public CheckpointType getCheckpointType() {
+    // getters and setters for all attributes
+    public CheckpointType getCurrentCheckpointType() {
         return checkpointtype;
     }
 
-    public void setCheckpointType(CheckpointType checkpointtype) {
+    public void setCurrentCheckpointType(CheckpointType checkpointtype) {
         this.checkpointtype = checkpointtype;
     }
 
@@ -106,7 +104,6 @@ public class Stages {
     public void setRidersPointsMountain(Map<Integer, Integer> NewRidersPointsMountain) {
         this.RidersPointsMountain = NewRidersPointsMountain;
     } 
-
     public Map<Integer, Integer> getRidersPoints() {
         return RidersPoints;
     }
@@ -114,31 +111,6 @@ public class Stages {
         this.RidersPoints = GivenListOfPoints;
 
     }
-
-
-    private List<Result> resultsList;
-
-
-    public LocalTime[] getRiderResults(int riderId) {
-        for (Result result : resultsList) {
-            if (result.getRider().getId() == riderId) {
-                return result.getRiderTimes();
-            }
-        }
-        return null;
-    }
-
-    public boolean deleteRiderResults(int riderId) {
-        for (Iterator<Result> iterator = resultsList.iterator(); iterator.hasNext();) {
-            Result result = iterator.next();
-            if (result.getRiderId() == riderId) {
-                iterator.remove();
-                return true;
-            }
-        }
-        return false;
-    }
-
     public StageState getState() {
         return state;
     }
@@ -147,8 +119,12 @@ public class Stages {
         this.state = newstate;
     }
 
-    public List<Result> getResults() {
-        return resultsList;
+
+    
+    public List<List<Object>> AdjustResultsList(List<List<Object>> originalList) {
+        originalList.remove(0);
+        return originalList;
+
     }
 
     public List<List<Object>> deepCopyList(List<List<Object>> originalList) {
@@ -199,18 +175,19 @@ public class Stages {
                 int firstKey = new ArrayList<>(reversedDictionary.keySet()).get(i);
                 int secondKey = new ArrayList<>(reversedDictionary.keySet()).get(i + 1);
                 
-                // Converts LocalTime to the seconds
-                long firstValSec = firstVal.toSecondOfDay();
-                long secondValSec = secondVal.toSecondOfDay();
+                // Converts LocalTime to the nanoseconds
+                long firstValSec = firstVal.toNanoOfDay();
+                long secondValSec = secondVal.toNanoOfDay();
 
-                if (firstValSec-1 == (secondValSec)) {
+                // comparing times, by removing second from one, so we can see if within one second
+                if (((firstValSec - secondValSec) < 1000000000) && ((firstValSec - secondValSec) > -1000000000) && ((firstValSec - secondValSec) != 0)){
                     reversedDictionary.put(firstKey, reversedDictionary.get(secondKey));
                     CompleteRecursion = true;
-                } else if (secondValSec-1 == (firstValSec)) {
+                } else if (((secondValSec - firstValSec) < 1000000000 ) && ((secondValSec -firstValSec ) > -1000000000) && ((secondValSec - firstValSec) != 0)){
                     reversedDictionary.put(secondKey, reversedDictionary.get(firstKey));
                     CompleteRecursion = true;
-
                 }
+
             } catch (Exception e) {
                 // Ignore and continue to the next iteration
             }
@@ -234,69 +211,77 @@ public class Stages {
     }
 
     public List<List<Object>> GetAdjustedFinishTime(List<List<Object>> Ranking) {
-        // Make a copy so that is mutable, so objects can be replaced.
+        // Make a copy of the ranking to ensure mutability.
         List<List<Object>> RankingCopy = new ArrayList<>();
-
+    
+        // Iterate through the original ranking to create a copy.
         for (List<Object> innerList : Ranking) {
             List<Object> copiedInnerList = new ArrayList<>(innerList);
             RankingCopy.add(copiedInnerList);
         }
-
-
-
+    
+        // Create a dictionary to store finish times indexed by position.
         Map<Integer, LocalTime> RankingDict = new HashMap<>();
-
+    
+        // Populate the dictionary with finish times from the original ranking.
         for (int i = 0; i < RankingCopy.size(); i++) {
             List<Object> sublist = Ranking.get(i);
-            LocalTime[] obj = (LocalTime[]) sublist.get(2);
-            LocalTime FinishTime = obj[obj.length - 1];
+            LocalTime[] obj = (LocalTime[]) sublist.get(2); // Assuming finish times are stored in the third element of each sublist.
+            LocalTime FinishTime = obj[obj.length - 1]; // Taking the last finish time.
             
             RankingDict.put(i, FinishTime);
-            
         }
-
+    
+        // Process the dictionary to adjust finish times.
         RankingDict = DealWithDict(RankingDict);
-
+    
+        // Counter to keep track of the current index in the ranking.
         int CounterForCheckingIfIndexIsCorrect = 0;
-
+    
+        // Iterate through the copied ranking to adjust finish times.
         for (List<Object> innerList : RankingCopy) { 
-
+            // Extract finish times from the sublist.
             LocalTime[] TimesAsArray = (LocalTime[]) innerList.get(2);
-
+    
+            // Create a copy of the finish times list.
             List<LocalTime> CopyOfTimes = new ArrayList<>();
-
             for (int i = 0; i < TimesAsArray.length; i++) {
                 CopyOfTimes.add(TimesAsArray[i]);
             }
-
-            for ( int key : RankingDict.keySet() ) {
+    
+            // Adjust the finish time using the dictionary.
+            for (int key : RankingDict.keySet()) {
                 if (key == CounterForCheckingIfIndexIsCorrect) {
                     LocalTime AdjustedTimeFromDict = RankingDict.get(key);
                     CopyOfTimes.add(AdjustedTimeFromDict);
                 }
             }
-
-            // Converting the list to LocalTime array.
+    
+            // Convert the adjusted finish times list to an array.
             LocalTime[] CopyOfTimesArray = new LocalTime[CopyOfTimes.size()];
-            
             for (int i = 0; i < CopyOfTimes.size(); i++) {
                 CopyOfTimesArray[i] = CopyOfTimes.get(i);
             }
-
+    
+            // Set the adjusted finish times array back to the sublist.
             innerList.set(2, CopyOfTimesArray);
+            // Update the sublist in the copied ranking.
             RankingCopy.set(CounterForCheckingIfIndexIsCorrect, innerList);
-
+    
+            // Increment the counter.
             CounterForCheckingIfIndexIsCorrect++;
-
         }
-
+    
+        // Return the modified ranking with adjusted finish times.
         return RankingCopy;
-
     }
 
     private List<List<Object>> AddElapsedTime(List<List<Object>> OriginalRanking){
 
+        // Make a copy of the ranking to ensure mutability.
         List<List<Object>> RankingCopy1 = new ArrayList<>();
+    
+        // Iterate through the original ranking to create a copy.
 
         for (List<Object> innerList : OriginalRanking) {
             List<Object> copiedInnerList = new ArrayList<>(innerList);
@@ -313,12 +298,14 @@ public class Stages {
             int ArrayOfLocalTimeslength = ArrayOfLocalTimes.length;
             LocalTime FinishTime = (LocalTime) ArrayOfLocalTimes[ArrayOfLocalTimeslength-1];
             
-            
             // Find the difference in seconds between the two LocalDateTime objects
-            long secondsDifference = ChronoUnit.SECONDS.between(StartTime, FinishTime);
+            long StartTimeInSeconds = StartTime.toNanoOfDay();
+            long FinishTimeInSeconds = FinishTime.toNanoOfDay();
+
+            long secondsDifference = FinishTimeInSeconds - StartTimeInSeconds;
 
             // Convert the difference in seconds to a LocalTime object
-            LocalTime timeDifference = LocalTime.ofSecondOfDay(secondsDifference);
+            LocalTime timeDifference = LocalTime.ofNanoOfDay(secondsDifference);
 
             RankingSublist.add(timeDifference);
             RankingCopy1.set(CounterForIndexInRanking,RankingSublist);
@@ -329,91 +316,109 @@ public class Stages {
     }
 
     public List<List<Object>> GetAdjustedElapsedList(List<List<Object>> RankingChangedName) {
-
+        // Create a deep copy of the original ranking.
         List<List<Object>> RankingDeepCopy = deepCopyList(RankingChangedName);
-
+    
+        // Container to hold lists of sublists grouped by stage ID.
         List<List<List<Object>>> ContainerForStageIdLists = new ArrayList<>();
-
-        // Adding all the stage ids to a list to iterate through
+    
+        // Create a list to hold unique stage IDs.
         List<Integer> ListOfStageIDs = new ArrayList<>();
+    
+        // Populate ListOfStageIDs with unique stage IDs from RankingDeepCopy.
         for (List<Object> Sublist : RankingDeepCopy) {
-            int StageId = (int) Sublist.get(0);
-            if (ListOfStageIDs.contains(StageId) == false) {
+            int StageId = (int) Sublist.get(0); // Assuming stage ID is stored in the first element of each sublist.
+            if (!ListOfStageIDs.contains(StageId)) {
                 ListOfStageIDs.add(StageId);
             }
         }
-
-        // Iterating through StageId and RankingCopy, if stage Id equal.
-        //if so that sublist is appended to that StageId list.
+    
+        // Iterate through each stage ID.
         for (int StageId : ListOfStageIDs) {
+            // Create a list to hold sublists with the current stage ID.
             List<List<Object>> StageIdLists = new ArrayList<>();
+            // Add sublists with the current stage ID to StageIdLists.
             for (List<Object> Sublist : RankingDeepCopy) {
                 int CurrentStageId = (int) Sublist.get(0);
-                if (CurrentStageId == StageId)
-                StageIdLists.add(Sublist);
+                if (CurrentStageId == StageId) {
+                    StageIdLists.add(Sublist);
+                }
             }
+            // Add StageIdLists to ContainerForStageIdLists.
             ContainerForStageIdLists.add(StageIdLists);
-
-        }       
-
+        }
+    
+        // Container to hold lists of adjusted sublists grouped by stage ID.
         List<List<List<Object>>> ContainerForAdjustedStageIdLists = new ArrayList<>();
-
+    
+        // Adjust finish times for each stage ID group.
         for (List<List<Object>> RankingCopySortedStageId : ContainerForStageIdLists) {
             RankingCopySortedStageId = GetAdjustedFinishTime(RankingCopySortedStageId);
-
             ContainerForAdjustedStageIdLists.add(RankingCopySortedStageId);
         }
-
+    
+        // Flatten the lists of adjusted sublists into a single list.
         List<List<Object>> RankingAdjustedTimes = new ArrayList<>();
-
         for (List<List<Object>> SubListOfSameRank : ContainerForAdjustedStageIdLists) {
             for (List<Object> ListOfAdjustedDetails : SubListOfSameRank) {
                 RankingAdjustedTimes.add(ListOfAdjustedDetails);
             }
         }
 
-
+        // Calculate and add elapsed time to the ranking with adjusted finish times.
         List<List<Object>> RankingCopy3 = AddElapsedTime(RankingAdjustedTimes);
 
-
-
+        // Initialize a counter for referencing the index of each sublist.
         int CounterForReferencingIndexOfSublist = 0;
-        for (List<Object> InnerList : RankingCopy3) { 
 
+        // Iterate through each sublist in RankingCopy3.
+        for (List<Object> InnerList : RankingCopy3) { 
+            // Extract the array of LocalTime objects representing finish times from the sublist.
             LocalTime[] TimesAsArray = (LocalTime[]) InnerList.get(2);
 
+            // Create a copy of finish times to manipulate.
             List<LocalTime> CopyOfTimes = new ArrayList<>();
-
             for (int i = 0; i < TimesAsArray.length; i++) {
                 CopyOfTimes.add(TimesAsArray[i]);
             }
 
+            // Remove the last element (finish time) from the copy of finish times.
             CopyOfTimes.remove(CopyOfTimes.size() - 1);
 
-            // Converting the list to LocalTime array.
+            // Convert the manipulated finish times list to an array of LocalTime objects.
             LocalTime[] CopyOfTimesArray = new LocalTime[CopyOfTimes.size()];
-            
             for (int i = 0; i < CopyOfTimes.size(); i++) {
                 CopyOfTimesArray[i] = CopyOfTimes.get(i);
             }
 
+            // Update the sublist with the adjusted finish times array.
             InnerList.set(2, CopyOfTimesArray);
+            
+            // Update the sublist in RankingCopy3.
             RankingCopy3.set(CounterForReferencingIndexOfSublist, InnerList);
-            CounterForReferencingIndexOfSublist ++ ;
-
+            
+            // Increment the counter for referencing the index of each sublist.
+            CounterForReferencingIndexOfSublist++;
         }
-        
+
+        // Return the modified ranking with adjusted elapsed times.
         return RankingCopy3;
     }
     
-    public List<List<Object>> AddRidersToList(int stageId, int riderId, LocalTime[] checkpointTimes) throws DuplicatedResultException, InvalidCheckpointTimesException{      
+    public void AddRidersToList(int stageId, int riderId, LocalTime[] checkpointTimes) throws DuplicatedResultException, InvalidCheckpointTimesException{      
         // checking to see if invalid checkpoint times
         if (checkpointTimes.length != (checkpoints.length + 2)) {
             throw new InvalidCheckpointTimesException("Incorrect amount of checkpoint times");
         }
+        if (ResultsList.size() != 0) {
+            List<Object> FirstItem =  (List<Object>) (ResultsList.get(0));
+            if (FirstItem.size() == 3) {
+                ResultsList = AdjustResultsList(ResultsList);
+            }
+        }
 
         //Creating a new list
-        List<Object> NewEntry = List.of(stageId, riderId, checkpoints);
+        List<Object> NewEntry = List.of(stageId, riderId, checkpointTimes);
 
         List<List<Object>> ResultsListAdjustedTimesRemoved = new ArrayList<>();
 
@@ -422,43 +427,74 @@ public class Stages {
             if ((int) SubList.get(1) == riderId) {
                 throw new DuplicatedResultException("Rider id of " + riderId + " already found");
             }
+            
             SubList.remove(4);
             SubList.remove(3);
+            
             ResultsListAdjustedTimesRemoved.add(SubList);
         }
 
-
+        // Adding the List to a List, so in same format as the main List of results
         ResultsListAdjustedTimesRemoved.add(NewEntry);
-
+        // Calling function to add elapsed time to all results
         ResultsListAdjustedTimesRemoved = AddElapsedTime(ResultsListAdjustedTimesRemoved);
-
+        // Adjusts the elapsed time, if they are within a seconds.
         ResultsListAdjustedTimesRemoved = GetAdjustedElapsedList(ResultsListAdjustedTimesRemoved);
 
-        return ResultsListAdjustedTimesRemoved;
+        if (stageType == StageType.TT) {
+            for (List<Object> SubList : ResultsListAdjustedTimesRemoved) {
+                int CurrentRiderId = (int) SubList.get(1);
+                if (CurrentRiderId == riderId) {
+                    LocalTime ElapsedTime = (LocalTime) SubList.get(3);
+                    SubList.set(4, ElapsedTime);
+                }
+            } 
+        }
+
+        for (List<Object> Sublists : ResultsListAdjustedTimesRemoved ) {
+            ResultsList.add(Sublists);
+        }
+
 
     }
 
     public LocalTime[] getRiderResultsInStageMethod(int stageId, int riderId) {
+        // List to store the rider's results in the specified stage.
         List<LocalTime> RiderResultsList = new ArrayList<>();
-
+    
+        // Flag to indicate if the rider ID is found in the results list.
         boolean NotInList = false;
+
+        List<Object> FirstItem =  (List<Object>) (ResultsList.get(0));
+        if (FirstItem.size() == 3) {
+            ResultsList = AdjustResultsList(ResultsList);
+        }
+
+
+        // Iterate through the results list to find the rider's results in the specified stage.
         for (List<Object> innerList : ResultsList) { 
+            // Check if the current innerList corresponds to the specified stage ID and rider ID.
             if ((innerList.get(0).equals(stageId)) && (innerList.get(1).equals(riderId))) {
-                
+                // Extract the checkpoint times from the innerList.
                 LocalTime[] RiderCheckPointTimes = (LocalTime[]) (innerList.get(2));
+    
+                // Iterate through the checkpoint times to add them to RiderResultsList,
+                // excluding the start and finish times.
                 int CounterForStartFinish = 0;
                 for (LocalTime Time: RiderCheckPointTimes) {
-                    if ((CounterForStartFinish != 0)&&(CounterForStartFinish != (RiderCheckPointTimes.length - 1))){
+                    if ((CounterForStartFinish != 0) && (CounterForStartFinish != (RiderCheckPointTimes.length - 1))) {
                         RiderResultsList.add(Time);
                     }
-                    CounterForStartFinish ++ ;
-                    
+                    CounterForStartFinish++;
                 }
+    
+                // Extract the elapsed time from the innerList and add it to RiderResultsList.
                 LocalTime ElapsedTime = (LocalTime) innerList.get(3);
                 RiderResultsList.add(ElapsedTime);
+    
+                // Set the flag to true indicating that the rider ID is found in the results list.
                 NotInList = true;
             }
-
         } 
 
         // Converting the list to LocalTime array.
@@ -586,17 +622,22 @@ public class Stages {
 
         // Sort the sublists based off of the Final Time. 
         ResultsSortedByFinishTime = SortListbasedOfFinalTime(ResultsList);
+        
+        // Iterating through the sorted by finish time list, and gets stage id from the sublist
 
         List<LocalTime> resultList = new ArrayList<>();
         for (List<Object> sublist : ResultsSortedByFinishTime) {
             int CurrentStageId = (int) sublist.get(0);
-
+            // If stage id is equal to the one passed in, that Adjusted elapsed time from that sublist, is added to the result list
             if (CurrentStageId == stageId) {
                 LocalTime AdjustedElapsedTime = (LocalTime) sublist.get(4);
                 resultList.add(AdjustedElapsedTime);
             }
             
         }
+
+        // The reason that stage id is still checked even though all results in the stage object's result list should be from the same stage, Is if there are 
+        //any errors when appending results. E.g. accidentily putting in a result from another stage. This code will handle that error and not display that elapsed time from the other stage.
 
         // Converting the list to LocalTime array.
         LocalTime[] RiderAdjustedElapsedTimes = new LocalTime[resultList.size()];
@@ -614,7 +655,7 @@ public class Stages {
         
     }
  
-    public List<Integer> GetPointsForStageType() {
+    public List<Integer> getPointsForStageType() {
 
         List<Integer> ListOfPoints = new ArrayList<>();
         // Creates an array of the points, in order, given to 1st -> 15th place.
@@ -637,7 +678,7 @@ public class Stages {
                 ListOfPoints.add(point);
             }
         } else if (stageType == StageType.TT) {
-            int[] ArrayOfPoints = {50,30,20,18,16,14,12,10,8,7,6,5,4,3,2};
+            int[] ArrayOfPoints = {20,17,15,13,11,10,9,8,7,6,5,4,3,2,1};
             // Adding the points to the List
             for (int point : ArrayOfPoints ){
                 ListOfPoints.add(point);
@@ -647,7 +688,7 @@ public class Stages {
     }
 
     public void AssignPointsToRiders() {
-        List<Integer> ListOfPoints = GetPointsForStageType();
+        List<Integer> ListOfPoints = getPointsForStageType();
         // Getting the list of riderIds for the stage
         List<Integer> SortedListOfRiderIds = new ArrayList<>();
         // Getting the Sorted Result List
@@ -658,9 +699,14 @@ public class Stages {
         }
         // Adds the riders ID and their given points to the dictionary
         int CounterToReferenceRiderIds = 0;
+        int NumberOfRiders = SortedListOfRiderIds.size();
         for (int Points : ListOfPoints) {
-            RidersPoints.put(SortedListOfRiderIds.get(CounterToReferenceRiderIds),Points);
-            CounterToReferenceRiderIds++;
+            // Assigns points to the riders in the list, and not out of list range.
+            if (CounterToReferenceRiderIds < NumberOfRiders) {
+                RidersPoints.put(SortedListOfRiderIds.get(CounterToReferenceRiderIds),Points);
+                CounterToReferenceRiderIds++;
+            }
+            
         }
         
     }
@@ -720,14 +766,20 @@ public class Stages {
             for (int point : ArrayOfPoints ){
                 ListOfPointsMountain.add(point);
             }
-        }
-        else if (CurrentCheckpointType == CheckpointType.HC) {
+        } else if (CurrentCheckpointType == CheckpointType.HC) {
             int[] ArrayOfPoints = {20,15,12,10,8,6,4,2};
             // Adding the points to the List
             for (int point : ArrayOfPoints ){
                 ListOfPointsMountain.add(point);
             }
         }
+        // } else if (CurrentCheckpointType == CheckpointType.SPRINT) {
+        //     int[] ArrayOfPoints = {20,17,15,13,11,10,9,8,7,6,5,4,3,2,1};
+        //     // Adding the points to the List
+        //     for (int point : ArrayOfPoints ){
+        //         ListOfPointsMountain.add(point);
+        //     }
+        // }
         return ListOfPointsMountain;
     } 
 
@@ -752,28 +804,61 @@ public class Stages {
         int CounterForCheckpoints = 1;
         int CounterForAssigningPoints = 0;
         for (Checkpoint CurrentCheckpoint : checkpoints) {
+            // Get the checkpoint type from the checkpoint class.
             CheckpointType CurrentCheckpointType = CurrentCheckpoint.getCheckpointType();
-            //Getting the list of points for that checkpoint type
-            List<Integer> ListOfMountainPoints = GetPointsForCheckpointTypeMountain(CurrentCheckpointType);
-            
-            //Sorting the List of Results based upon Checkpoint times
-            List<List<Object>> SortedResultsList = SortListAtIndex(ResultsList, CounterForCheckpoints);
-            
-            // Adding the points to the dict, if the rider id already there it updates the points
-            for (List<Object> Sublist : SortedResultsList) {
-                int RiderId = (int) Sublist.get(1);
-                try {
-                    RidersPointsMountain.put(RiderId,RidersPointsMountain.get(RiderId) + ListOfMountainPoints.get(CounterForAssigningPoints));
-                }
-                catch (Exception e) {
 
+            // If the checkpoint type is Sprint, then it adds those points to the Rider Points.
+            if (CurrentCheckpointType == CheckpointType.SPRINT) {
+                List<Integer> ListOfPoints = new ArrayList<>();
+
+                int[] ArrayOfPoints = {20,17,15,13,11,10,9,8,7,6,5,4,3,2,1};
+                // Adding the points to the List
+                for (int point : ArrayOfPoints ){
+                    ListOfPoints.add(point);
                 }
-                finally {
-                    RidersPointsMountain.put(RiderId,ListOfMountainPoints.get(CounterForAssigningPoints));
-                }
+
+                //Sorting the List of Results based upon Checkpoint times
+                List<List<Object>> SortedResultsList = SortListAtIndex(ResultsList, CounterForCheckpoints);
                 
-            }   
-         
+                // Adding the points to the dict, if the rider id already there it updates the points, by adding to the last result.
+                for (List<Object> Sublist : SortedResultsList) {
+                    int RiderId = (int) Sublist.get(1);
+                    try {
+                        RidersPoints.put(RiderId,RidersPointsMountain.get(RiderId) + RidersPoints.get(CounterForAssigningPoints));
+                    }
+                    catch (Exception e) {
+
+                    }
+                    finally {
+                        RidersPoints.put(RiderId,RidersPoints.get(CounterForAssigningPoints));
+                    }
+                    
+                } 
+
+
+            } else {
+                //Getting the list of points for that checkpoint type
+                List<Integer> ListOfMountainPoints = GetPointsForCheckpointTypeMountain(CurrentCheckpointType);
+                
+                //Sorting the List of Results based upon Checkpoint times
+                List<List<Object>> SortedResultsList = SortListAtIndex(ResultsList, CounterForCheckpoints);
+                
+                // Adding the points to the dict, if the rider id already there it updates the points, by adding to the last result.
+                for (List<Object> Sublist : SortedResultsList) {
+                    int RiderId = (int) Sublist.get(1);
+                    try {
+                        RidersPointsMountain.put(RiderId,RidersPointsMountain.get(RiderId) + ListOfMountainPoints.get(CounterForAssigningPoints));
+                    }
+                    catch (Exception e) {
+
+                    }
+                    finally {
+                        RidersPointsMountain.put(RiderId,ListOfMountainPoints.get(CounterForAssigningPoints));
+                    }
+                    
+                } 
+            }
+
             CounterForAssigningPoints ++;
             CounterForCheckpoints ++;
 
@@ -811,17 +896,70 @@ public class Stages {
         return PointsArray;
     }
 
+    // Adding a Categorized Climb to the Categorized Climb List
     public void addCategorizedClimb(CategorizedClimb climb) {
         categorizedClimbs.add(climb);
-    }
 
+        List<Checkpoint> CheckpointList = new ArrayList<>();
+
+        int CheckpointId = 0;
+        if (checkpointIds.size() != 0) {
+            CheckpointId = ((checkpointIds.get(checkpointIds.size() - 1)) + 1);
+            checkpointIds.add(CheckpointId);
+            for (Checkpoint checkpoint : checkpoints) {
+                CheckpointList.add(checkpoint);
+            }
+        }
+        else{
+            checkpointIds.add(0);
+        }
+
+        
+        CheckpointType CurrentCheckpointType = climb.getType();
+        Checkpoint NewCheckpoint = new Checkpoint (CheckpointId, CurrentCheckpointType);
+        CheckpointList.add(NewCheckpoint);
+
+        // Converting the list to LocalTime array.
+        Checkpoint[] CheckpointArray = new Checkpoint[CheckpointList.size()];
+        for (int i = 0; i < CheckpointList.size(); i++) {
+            CheckpointArray[i] = CheckpointList.get(i);
+        }
+
+        setCheckpoints(CheckpointArray);
+
+    }
+    // Adding a Intermediate Sprint to the Intermediate Sprint List
     public void addIntermediateSprint(IntermediateSprint sprint) {
         intermediateSprints.add(sprint);
+        
+        List<Checkpoint> CheckpointList = new ArrayList<>();
+
+        int CheckpointId = 0;
+        if (checkpointIds.size() != 0) {
+            CheckpointId = ((checkpointIds.get(checkpointIds.size() - 1)) + 1);
+            checkpointIds.add(CheckpointId);
+            for (Checkpoint checkpoint : checkpoints) {
+                CheckpointList.add(checkpoint);
+            }
+        }
+        else{
+            checkpointIds.add(0);
+        }
+
+
+        CheckpointType CurrentCheckpointType = CheckpointType.SPRINT;
+        Checkpoint NewCheckpoint = new Checkpoint(CheckpointId, CurrentCheckpointType);
+        CheckpointList.add(NewCheckpoint);
+
+        // Converting the list to LocalTime array.
+        Checkpoint[] CheckpointArray = new Checkpoint[CheckpointList.size()];
+        for (int i = 0; i < CheckpointList.size(); i++) {
+            CheckpointArray[i] = CheckpointList.get(i);
+        }
+
+        setCheckpoints(CheckpointArray);
     }
+     
 
 }
 
-//set stage method
-
-//for each rider
-//get rider id
