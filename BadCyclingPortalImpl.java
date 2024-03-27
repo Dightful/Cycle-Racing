@@ -43,15 +43,17 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 
 	// List to store races
     private List<Races> racesList = new ArrayList<>();
+	private List<Integer> nextRaceId = new ArrayList<>();
 
     // Returns an array of race IDs
 	@Override
 	public int[] getRaceIds() {
-		int[] raceIds = new int[RacesArray.length];
-		for (int i = 0; i < RacesArray.length; i++) {
-			raceIds[i] = RacesArray[i].getId();
-		}
-		return raceIds;
+		//Convert List to Array
+		int[] RaceArray = new int[nextRaceId.size()];
+        for (int i = 0; i < nextRaceId.size(); i++) {
+            RaceArray[i] = nextRaceId.get(i);
+        }
+		return RaceArray;
 	}
 
 	@Override
@@ -68,9 +70,18 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 				throw new IllegalNameException("A race with this name already exists");
 			}
 		}
+		int raceid = 0;
+		//Generate unique ID for race
+		if (nextRaceId.isEmpty()) {
+			nextRaceId.add(0);
+		} else {
+			raceid = nextRaceId.get(nextRaceId.size() - 1) + 1;
+			nextRaceId.add(raceid);
+		}
+
 
 		// Create a new race and add it to the list
-		Races newRace = new Races(name, description);
+		Races newRace = new Races(raceid, name, description);
 		racesList.add(newRace);
 		List<Races> TempRacesList = new ArrayList<>(racesList);
 				//Adding new stage to list
@@ -85,13 +96,13 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		
 
 		// Return ID of new race
-		return newRace.getId();
+		return newRace.getRaceId();
 	}
 
 	@Override
 	public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
 		for (Races race : racesList) {
-			if (race.getId() == raceId) {
+			if (race.getRaceId() == raceId) {
 				// Format details
 				String details = "Name: " + race.getRacename() +
 				                 "\nDescription: " + race.getDescription();
@@ -107,7 +118,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	@Override
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {
 		for (int i = 0; i < racesList.size(); i++) {
-			if (racesList.get(i).getId() == raceId) {
+			if (racesList.get(i).getRaceId() == raceId) {
 				racesList.remove(i);
 				return;
 			}
@@ -122,7 +133,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 	@Override
 	public int getNumberOfStages(int raceId) throws IDNotRecognisedException {
 		for (Races race : racesList) {
-			if (race.getId() == raceId) {
+			if (race.getRaceId() == raceId) {
 				return race.getTotalStages();
 			}
 		}
@@ -150,7 +161,7 @@ public class BadCyclingPortalImpl implements CyclingPortal {
 		}
 
 		for (Races race : racesList) {
-			if (race.getId() == raceId) {
+			if (race.getStages() != null) {
 				// Check if stageName is already in use
 				for (Stages stage : race.getStages()) {
 					if (stage.getStageName().equals(name)) {
